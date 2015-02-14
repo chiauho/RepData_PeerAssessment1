@@ -65,7 +65,7 @@ Extract data for average steps per day group by interval type. Then plot the res
 tempdata <- tapply(activity.data.clean$steps,activity.data.clean$interval,mean)
 #Plot the result
 plot(tempdata,type="l",xaxt="n",xlab="5-minute Interval",ylab="Average number of steps taken",main="Time Series Plot")
-axis(1,at=1:288,labels=names(tempdata),cex.axis=0.5)
+axis(1, at=seq(0,288,by=288/4),labels=c(0,600,1200,1800,2400))
 ```
 
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
@@ -152,22 +152,20 @@ data$dayofweek <- as.factor(data$dayofweek)
 ```r
 weekend.data <- subset(data,data$dayofweek == "Weekend")
 weekend.data <- tapply(weekend.data$steps,weekend.data$interval,mean)
-weekend.df <- data.frame(steps=names(weekend.data),mean=weekend.data,dayofweek="Weekend")
+weekend.df <- data.frame(steps=as.integer(names(weekend.data)),mean=weekend.data,dayofweek="Weekend")
 weekday.data <- subset(data,data$dayofweek == "Weekday")
 weekday.data <- tapply(weekday.data$steps,weekday.data$interval,mean)
-weekday.df <- data.frame(steps=names(weekday.data),mean=weekday.data,dayofweek="Weekday")
+weekday.df <- data.frame(steps=as.integer(names(weekday.data)),mean=weekday.data,dayofweek="Weekday")
 c.data <- rbind(weekend.df,weekday.df)
 c.data$steps <- as.integer(c.data$steps)
 
 #Plot the result
 library(ggplot2)
-x.limit <- nrow(subset(c.data,dayofweek=="Weekend"))
-breaks=seq(0,x.limit,x.limit/4)
-labels=seq(0,2400,2400/(length(breaks)-1))
+x=seq(0,2400,600)
 g<-ggplot(data=c.data,aes(x=steps,y=mean))
-g<-g+geom_line(aes(group=dayofweek))+facet_grid(dayofweek~.)+ 
-  scale_x_continuous(breaks=breaks,labels=labels)+
-  ggtitle("Time Series Plot")
+g<-g+geom_line(aes(group=dayofweek))+facet_grid(dayofweek~.)
+g<-g+scale_x_continuous(breaks=x,labels=as.character(x))
+g<-g+ggtitle("Time Series Plot")
 g
 ```
 
